@@ -17,8 +17,8 @@ def csrf_token(request):
     """
     Get a CSRF token for use with unsafe methods (POST, PUT, DELETE)
     """
-    token = rotate_token(request)
-    return Response({'csrfToken': token})
+    rotate_token(request)
+    return Response({'detail': 'CSRF token updated'})
 
 # Authentication views
 @api_view(['POST', 'OPTIONS'])
