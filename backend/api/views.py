@@ -1,5 +1,6 @@
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
+from django.middleware.csrf import rotate_token
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
@@ -8,6 +9,16 @@ from rest_framework.response import Response
 
 from .models import Item
 from .serializers import ItemSerializer, UserSerializer
+
+# Get CSRF token
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def csrf_token(request):
+    """
+    Get a CSRF token for use with unsafe methods (POST, PUT, DELETE)
+    """
+    token = rotate_token(request)
+    return Response({'csrfToken': token})
 
 # Authentication views
 @api_view(['POST', 'OPTIONS'])

@@ -19,6 +19,19 @@ export function getCsrfToken(): string | null {
     return null;
 }
 
+// Fetch CSRF token from the server
+export async function fetchCsrfToken() {
+    const response = await fetch(`${getBackendUrl()}/api/csrf-token/`, {
+        credentials: 'include',
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch CSRF token');
+    }
+
+    return response.json();
+}
+
 // Base fetch function with authentication and CSRF token
 export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
     const url = `${getBackendUrl()}${endpoint}`;
@@ -26,6 +39,9 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
     // For unsafe methods, make sure we have a CSRF token
     const method = options.method || 'GET';
     if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method.toUpperCase())) {
+        // Refresh the Csrf token in the cookie
+        await fetchCsrfToken();
+
         // Now get the token from cookie (should be set after fetchCsrfToken)
         const token = getCsrfToken();
 
